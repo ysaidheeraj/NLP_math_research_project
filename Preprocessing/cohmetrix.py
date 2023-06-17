@@ -80,13 +80,7 @@ def call_request(text, captcha):
 
     url = 'http://141.225.61.35/CohMetrix2017/'
 
-    cookie_val = 'ASP.NET_SessionId=ipmnh0ipmdossnvulbfhx4gn'
-    if captcha == captcha_mapping[2]:
-        cookie_val = 'ASP.NET_SessionId=px0204dld2o4k2yph3kblgbf'
-    elif captcha == captcha_mapping[3]:
-        cookie_val = 'ASP.NET_SessionId=q1lus5u14ata44dl13vpjfpi'
-    elif captcha == captcha_mapping[4]:
-        cookie_val = 'ASP.NET_SessionId=0omkxddhutce01woxghepflh'
+    cookie_val = ''
     
     print(captcha, cookie_val)
 
@@ -96,7 +90,7 @@ def call_request(text, captcha):
         'Cache-Control': 'max-age=0',
         'Connection': 'keep-alive',
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Cookie': cookie_val,
+        'Cookie': cookie_val, #Put appropriate cookie value
         'Origin': 'http://141.225.61.35',
         'Referer': 'http://141.225.61.35/cohmetrix2017',
         'Upgrade-Insecure-Requests': '1',
