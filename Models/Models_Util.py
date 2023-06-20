@@ -51,7 +51,9 @@ MATH_VOCAB_FEATURES = ['number_of_math_vocab']
 
 TARGET_FEATURE = ['level']
 
-GPT_TARGET_FEATURE = ['gpt_val']
+GPT_5_TARGET_FEATURE = ['gpt_val_5']
+
+GPT_3_TARGET_FEATURE = ['gpt_val_3']
 
 def plot_confusion_matrix(confusion_matrix, labels):
     fig, ax = plt.subplots()
