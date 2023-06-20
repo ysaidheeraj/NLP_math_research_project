@@ -14,6 +14,46 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import classification_report, confusion_matrix
 warnings.filterwarnings("ignore")
 
+NER_FEATURES = ['CARDINAL',
+ 'DATE',
+ 'EVENT',
+ 'FAC',
+ 'GPE',
+ 'LANGUAGE',
+ 'LAW',
+ 'LOC',
+ 'MONEY',
+ 'NORP',
+ 'ORDINAL',
+ 'ORG',
+ 'PERCENT',
+ 'PERSON',
+ 'PRODUCT',
+ 'QUANTITY',
+ 'TIME',
+ 'WORK_OF_ART']
+
+POS_FEATURES = ['ADJ', 'ADP', 'ADV', 'AUX', 'CONJ', 'CCONJ', 'DET', 'INTJ', 'NOUN', 'NUM', 'PART', 'PRON', 'PROPN', 'PUNCT', 'SCONJ', 'SYM', 'VERB', 'X']
+
+LINGUISTIC_CAT_FEATURES = ['sentence_count_cat', 'word_count_cat', 'words_per_sentence_cat', 'average_word_length_cat', 'large_words_cat']
+
+LINGUISTIC_NUM_FEATURES = ['sentence_count', 'word_count', 'words_per_sentence', 'average_word_length', 'large_words']
+
+CONDENSED_LINGUISTIC_FEATURES = ['pron_words_ratio', 'pron_sents_ratio', 'adj_sents_ratio',	'adj_words_ratio']
+
+MATH_CAT_FEATURES = ['has_exp', 'has_mod', 'has_logarithm', 'has_fraction', 'has_eq', 'has_neq', 'has_pow', 'has_symbol', 'has_digits']
+
+MATH_NUM_FEATURES = ['no_of_exps', 'no_of_pow', 'symbol_count' ,'mod_count', 'log_count', 'fracs_count', 'eqlts_count', 'neqlts_count', 'max_degree_of_equations', 'number_of_digits', 'number_of_numbers']
+
+MANDATORY_FEATURES = ['no_of_equations', 'no_of_variables', 'type']
+
+MATH_VOCAB_FEATURES = ['number_of_math_vocab']
+
+TARGET_FEATURE = ['level']
+
+GPT_5_TARGET_FEATURE = ['gpt_val_5']
+
+GPT_3_TARGET_FEATURE = ['gpt_val_3']
 
 def plot_confusion_matrix(confusion_matrix, labels):
     fig, ax = plt.subplots()
@@ -51,7 +91,7 @@ def evaluation(y_train_pred, y_test_pred, y_train, y_test):
   print("\ntest_evaluation:\n")
   print(classification_report(y_test_pred, y_test))
   print(confusion_matrix(y_test_pred, y_test))
-  labels = ["Level 1", "Level 2", "Level 3"] #, "Level 4", "Level 5"]
+  labels = ["Level 1", "Level 2", "Level 3"]
   if y_train.nunique() == 5:
       labels = ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5"]
   plot_confusion_matrix(confusion_matrix(y_test_pred, y_test), labels)
@@ -59,12 +99,12 @@ def evaluation(y_train_pred, y_test_pred, y_train, y_test):
 
 # Level1 + Level2 -> Level1, Level3->Level2, Level4+Level5 -> Level3
 def club_class(class_var):
-    if class_var == 'Level 1' or class_var == 'Level 2':
-        return 'Level 1'
-    elif class_var == 'Level 3' or class_var == 'Level 4':
-        return 'Level 2'
+    if class_var == 1 or class_var == 2:
+        return 1
+    elif class_var == 3 or class_var == 4:
+        return 2
     else:
-        return 'Level 3'
+        return 3
 
 def encode_target(class_var):
     return int(class_var.split(" ")[1])
@@ -81,18 +121,15 @@ def get_metrics(train_act,train_pred,test_act,test_pred,model_description,datafr
     return(dataframe)
 
 
-def rf_model(data, test_size = 0.2, use_smote_technique=1, target_feature="level_x", club_target=False, experiment="Experiment", scores=scores):
-    
-    data1 = data
+def rf_model(data, test_size = 0.2, use_smote_technique=1, target_feature="level", club_target=False, experiment="Experiment", scores=scores_df):
 
     # Seperate the target variable 
-    X = data1.drop(columns = [target_feature])
-    y = data1[target_feature]
+    X = data.drop(columns = [target_feature])
+    y = data[target_feature]
 
     if y.dtype != "int64":
         y = y.apply(encode_target)
 
-    print(y.dtypes)
 
     # Split the data into test and train
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = test_size, random_state = 2, stratify = y)
@@ -113,16 +150,14 @@ def rf_model(data, test_size = 0.2, use_smote_technique=1, target_feature="level
         print("Class distribution after SMOTE:", Counter(y_train))
 
     # Random Forest Classifier - Machine Learning Model
-    rfc=RandomForestClassifier(n_jobs=-1, random_state=42, n_estimators=15)
+    rfc=RandomForestClassifier(n_jobs=-1, random_state=42)
     param_grid = {
         'max_depth': [5, 7, 9],                      # Maximum depth of the tree
         'min_samples_split': [2, 5, 10],             # Minimum number of samples required to split a node
-        # 'min_samples_leaf': [1, 2, 3],               # Minimum number of samples required at a leaf node
         'max_features': ['auto'],    # Number of features to consider at each split
         'criterion': ['gini', 'entropy', 'log_loss'],
         'oob_score': [True],
-        'n_estimators': [15],
-        # 'class_weight': ['balanced', 'balanced_subsample']    
+        'n_estimators': [25],
     }
 
     if use_smote_technique != 1:
