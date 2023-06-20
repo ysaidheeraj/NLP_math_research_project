@@ -97,12 +97,12 @@ def evaluation(y_train_pred, y_test_pred, y_train, y_test):
 
 # Level1 + Level2 -> Level1, Level3->Level2, Level4+Level5 -> Level3
 def club_class(class_var):
-    if class_var == 'Level 1' or class_var == 'Level 2':
-        return 'Level 1'
-    elif class_var == 'Level 3' or class_var == 'Level 4':
-        return 'Level 2'
+    if class_var == 1 or class_var == 2:
+        return 1
+    elif class_var == 3 or class_var == 4:
+        return 2
     else:
-        return 'Level 3'
+        return 3
 
 def encode_target(class_var):
     return int(class_var.split(" ")[1])
@@ -130,7 +130,6 @@ def rf_model(data, test_size = 0.2, use_smote_technique=1, target_feature="level
     if y.dtype != "int64":
         y = y.apply(encode_target)
 
-    print(y.dtypes)
 
     # Split the data into test and train
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = test_size, random_state = 2, stratify = y)
