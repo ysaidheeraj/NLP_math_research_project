@@ -151,16 +151,14 @@ def rf_model(data, test_size = 0.2, use_smote_technique=1, target_feature="level
         print("Class distribution after SMOTE:", Counter(y_train))
 
     # Random Forest Classifier - Machine Learning Model
-    rfc=RandomForestClassifier(n_jobs=-1, random_state=42, n_estimators=15)
+    rfc=RandomForestClassifier(n_jobs=-1, random_state=42)
     param_grid = {
         'max_depth': [5, 7, 9],                      # Maximum depth of the tree
         'min_samples_split': [2, 5, 10],             # Minimum number of samples required to split a node
-        # 'min_samples_leaf': [1, 2, 3],               # Minimum number of samples required at a leaf node
         'max_features': ['auto'],    # Number of features to consider at each split
         'criterion': ['gini', 'entropy', 'log_loss'],
         'oob_score': [True],
-        'n_estimators': [15],
-        # 'class_weight': ['balanced', 'balanced_subsample']    
+        'n_estimators': [25],
     }
 
     if use_smote_technique != 1:
