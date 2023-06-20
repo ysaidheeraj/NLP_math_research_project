@@ -89,7 +89,7 @@ def evaluation(y_train_pred, y_test_pred, y_train, y_test):
   print("\ntest_evaluation:\n")
   print(classification_report(y_test_pred, y_test))
   print(confusion_matrix(y_test_pred, y_test))
-  labels = ["Level 1", "Level 2", "Level 3"] #, "Level 4", "Level 5"]
+  labels = ["Level 1", "Level 2", "Level 3"]
   if y_train.nunique() == 5:
       labels = ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5"]
   plot_confusion_matrix(confusion_matrix(y_test_pred, y_test), labels)
