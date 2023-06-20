@@ -119,7 +119,7 @@ def get_metrics(train_act,train_pred,test_act,test_pred,model_description,datafr
     return(dataframe)
 
 
-def rf_model(data, test_size = 0.2, use_smote_technique=1, target_feature="level_x", club_target=False, experiment="Experiment", scores=scores):
+def rf_model(data, test_size = 0.2, use_smote_technique=1, target_feature="level_x", club_target=False, experiment="Experiment", scores=scores_df):
     
     data1 = data
 
