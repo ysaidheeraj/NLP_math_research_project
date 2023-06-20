@@ -14,6 +14,44 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import classification_report, confusion_matrix
 warnings.filterwarnings("ignore")
 
+NER_FEATURES = ['CARDINAL',
+ 'DATE',
+ 'EVENT',
+ 'FAC',
+ 'GPE',
+ 'LANGUAGE',
+ 'LAW',
+ 'LOC',
+ 'MONEY',
+ 'NORP',
+ 'ORDINAL',
+ 'ORG',
+ 'PERCENT',
+ 'PERSON',
+ 'PRODUCT',
+ 'QUANTITY',
+ 'TIME',
+ 'WORK_OF_ART']
+
+POS_FEATURES = ['ADJ', 'ADP', 'ADV', 'AUX', 'CONJ', 'CCONJ', 'DET', 'INTJ', 'NOUN', 'NUM', 'PART', 'PRON', 'PROPN', 'PUNCT', 'SCONJ', 'SYM', 'VERB', 'X']
+
+LINGUISTIC_CAT_FEATURES = ['sentence_count_cat', 'word_count_cat', 'words_per_sentence_cat', 'average_word_length_cat', 'large_words_cat']
+
+LINGUISTIC_NUM_FEATURES = ['sentence_count', 'word_count', 'words_per_sentence', 'average_word_length', 'large_words']
+
+CONDENSED_LINGUISTIC_FEATURES = ['pron_words_ratio', 'pron_sents_ratio', 'adj_sents_ratio',	'adj_words_ratio']
+
+MATH_CAT_FEATURES = ['has_exp', 'has_mod', 'has_logarithm', 'has_fraction', 'has_eq', 'has_neq', 'has_pow', 'has_symbol', 'has_digits']
+
+MATH_NUM_FEATURES = ['no_of_exps', 'no_of_pow', 'symbol_count' ,'mod_count', 'log_count', 'fracs_count', 'eqlts_count', 'neqlts_count', 'max_degree_of_equations', 'number_of_digits', 'number_of_numbers']
+
+MANDATORY_FEATURES = ['no_of_equations', 'no_of_variables', 'type']
+
+MATH_VOCAB_FEATURES = ['number_of_math_vocab']
+
+TARGET_FEATURE = ['level_x']
+
+GPT_TARGET_FEATURE = ['gpt_val']
 
 def plot_confusion_matrix(confusion_matrix, labels):
     fig, ax = plt.subplots()
