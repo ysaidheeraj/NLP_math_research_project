@@ -15,6 +15,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.naive_bayes import GaussianNB
+import lightgbm as lgb
 from sklearn.datasets import make_classification
 warnings.filterwarnings("ignore")
 
@@ -233,4 +234,57 @@ def Naive_Bayes_Model(data, test_size = 0.2, club_target=False, use_smote_techni
     print(evaluation(y_train_pred, y_test_pred, y_train, y_test))
 
     scores = get_metrics(y_train, clf.predict(X_train), y_test, clf.predict(X_test), experiment, scores)
+    return scores
+
+def light_GBM(data, test_size = 0.2, club_target=False, use_smote_technique=1, experiment="NB_Experiment", scores=scores_df):
+    # Seperate the target variable 
+    X = data.drop(columns = [target_feature])
+    y = data[target_feature]
+
+    if y.dtype != "int64":
+        y = y.apply(encode_target)
+
+
+    # Split the data into test and train
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = test_size, random_state = 2, stratify = y)
+    if club_target:
+        y_train = y_train.apply(club_class)
+        y_test = y_test.apply(club_class)
+
+    # Smote the data
+    if use_smote_technique == 1:
+        X_train, y_train = smote_data(X_train, y_train)
+
+    # Random Forest Classifier - Machine Learning Model
+    lgb_model = lgb.LGBMClassifier(random_state=42)
+    param_grid = {
+        'learning_rate': [0.1, 0.01],
+        'n_estimators': [100, 200],
+        'num_leaves': [31, 50],
+        'min_child_samples': [20, 30],
+        'reg_alpha': [0, 1],
+        'reg_lambda': [0, 1]
+    }
+
+    if use_smote_technique != 1:
+        param_grid['class_weight'] = ['balanced', 'balanced_subsample'] 
+
+    # Perform grid search to find the best combination of parameters
+    grid_search = GridSearchCV(lgb_model, param_grid, cv=5)
+    grid_search.fit(X_train, y_train)
+
+    # Obtain the best values and best score
+    print("Best Parameters: ", grid_search.best_params_)
+    print("Best Score: ", grid_search.best_score_)
+
+    # Evaluation of model
+    y_test_pred = grid_search.best_estimator_.predict(X_test)
+    y_train_pred = grid_search.best_estimator_.predict(X_train)
+    evaluation(y_train_pred, y_test_pred, y_train, y_test)
+
+    # obtain Best Features
+    best_model = grid_search.best_estimator_
+
+    scores = get_metrics(y_train, best_model.predict(X_train), y_test, best_model.predict(X_test), experiment, scores)
+    
     return scores
