@@ -12,6 +12,10 @@ from imblearn.over_sampling import SMOTE
 import warnings
 from sklearn.metrics import f1_score
 from sklearn.metrics import classification_report, confusion_matrix
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.naive_bayes import GaussianNB
+from sklearn.datasets import make_classification
 warnings.filterwarnings("ignore")
 
 NER_FEATURES = ['CARDINAL',
@@ -120,6 +124,20 @@ def get_metrics(train_act,train_pred,test_act,test_pred,model_description,datafr
     dataframe = dataframe.append(s1, ignore_index=True)
     return(dataframe)
 
+def smote_data(inp, target):
+     # Count the class distribution before applying SMOTE
+    print("Class distribution before SMOTE:", Counter(target))
+
+    # Apply SMOTE to the dataset
+    smote = SMOTE(random_state=42)
+    inp, target = smote.fit_resample(inp, target)
+
+    # Count the class distribution after applying SMOTE
+    print("Class distribution after SMOTE:", Counter(target))
+
+    return inp, target
+
+
 
 def rf_model(data, test_size = 0.2, use_smote_technique=1, target_feature="level", club_target=False, experiment="Experiment", scores=scores_df):
 
@@ -139,15 +157,7 @@ def rf_model(data, test_size = 0.2, use_smote_technique=1, target_feature="level
 
     # Smote the data
     if use_smote_technique == 1:
-        # Count the class distribution before applying SMOTE
-        print("Class distribution before SMOTE:", Counter(y_train))
-
-        # Apply SMOTE to the dataset
-        smote = SMOTE(random_state=42)
-        X_train, y_train = smote.fit_resample(X_train, y_train)
-
-        # Count the class distribution after applying SMOTE
-        print("Class distribution after SMOTE:", Counter(y_train))
+        X_train, y_train = smote_data(X_train, y_train)
 
     # Random Forest Classifier - Machine Learning Model
     rfc=RandomForestClassifier(n_jobs=-1, random_state=42)
@@ -187,4 +197,40 @@ def rf_model(data, test_size = 0.2, use_smote_technique=1, target_feature="level
     for i, feature in enumerate(X.columns[indices]):
         print(f"{i + 1}. {feature}: {importances[indices[i]] * 100}")
     
+    return scores
+
+
+def Naive_Bayes_Model(data, test_size = 0.2, club_target=False, use_smote_technique=1, experiment="NB_Experiment", scores=scores_df):
+
+    # Seperate the target variable
+    X = data.drop(columns = ['level'])
+    y = data['level']
+
+    if y.dtype != "int64":
+        y = y.apply(encode_target)
+
+    # Split the data into test and train
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = test_size, random_state = 2, stratify = y)
+
+    if club_target:
+        y_train = y_train.apply(club_class)
+        y_test = y_test.apply(club_class)
+    
+    # Smote the data
+    if use_smote_technique == 1:
+        X_train, y_train = smote_data(X_train, y_train)
+    
+    # Converting all the datatypes to float
+    X_train = X_train.astype('float32')
+    y_train = y_train.astype('float32')
+
+    # Naive Bayes Classifier Model
+    clf = GaussianNB()
+    clf.fit(X_train, y_train)
+
+    y_test_pred = clf.predict(X_test)
+    y_train_pred = clf.predict(X_train)
+    print(evaluation(y_train_pred, y_test_pred, y_train, y_test))
+
+    scores = get_metrics(y_train, clf.predict(X_train), y_test, clf.predict(X_test), experiment, scores)
     return scores
