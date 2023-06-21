@@ -17,6 +17,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.naive_bayes import GaussianNB
 import lightgbm as lgb
 from sklearn.datasets import make_classification
+from scipy.stats import randint as sp_randint
 warnings.filterwarnings("ignore")
 
 NER_FEATURES = ['CARDINAL',
@@ -236,7 +237,7 @@ def Naive_Bayes_Model(data, test_size = 0.2, club_target=False, use_smote_techni
     scores = get_metrics(y_train, clf.predict(X_train), y_test, clf.predict(X_test), experiment, scores)
     return scores
 
-def light_GBM(data, test_size = 0.2, club_target=False, use_smote_technique=1, experiment="NB_Experiment", scores=scores_df):
+def light_GBM(data, test_size = 0.2, use_smote_technique=1, target_feature="level", club_target=False, experiment="Experiment", scores=scores_df):
     # Seperate the target variable 
     X = data.drop(columns = [target_feature])
     y = data[target_feature]
@@ -259,9 +260,9 @@ def light_GBM(data, test_size = 0.2, club_target=False, use_smote_technique=1, e
     lgb_model = lgb.LGBMClassifier(random_state=42)
     param_grid = {
         'learning_rate': [0.1, 0.01],
-        'n_estimators': [100, 200],
-        'num_leaves': [31, 50],
-        'min_child_samples': [20, 30],
+        'n_estimators': [25],
+        'num_leaves': [20,30,50],
+        'min_child_samples': [10,20,30],
         'reg_alpha': [0, 1],
         'reg_lambda': [0, 1]
     }
