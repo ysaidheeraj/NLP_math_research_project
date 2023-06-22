@@ -182,6 +182,7 @@ def rf_model(data, test_size = 0.2, use_smote_technique=1, target_feature="level
     # Obtain the best values and best score
     print("Best Parameters: ", grid_search.best_params_)
     print("Best Score: ", grid_search.best_score_)
+    print("OOB Score: ", grid_search.best_estimator_.oob_score_)
 
     # Evaluation of model
     y_test_pred = grid_search.best_estimator_.predict(X_test)
@@ -268,7 +269,7 @@ def light_GBM(data, test_size = 0.2, use_smote_technique=1, target_feature="leve
     }
 
     if use_smote_technique != 1:
-        param_grid['class_weight'] = ['balanced', 'balanced_subsample'] 
+        param_grid['class_weight'] = ['balanced'] 
 
     # Perform grid search to find the best combination of parameters
     grid_search = GridSearchCV(lgb_model, param_grid, cv=5)
